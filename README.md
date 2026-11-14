@@ -17,6 +17,9 @@
 
 ## Overview
 
+<img width="1830" height="967" alt="image" src="https://github.com/user-attachments/assets/e009bb62-ed41-4f1c-bebb-784b88b969d6" />
+
+
 **`egypt-cars-prediction-model`** is a production-ready machine learning inference service and web application tailored for the Egyptian automotive market[cite: 1, 2]. Trained on **300,000 structured records** spanning **42 brands** and **233 models/trims**, the system estimates market valuations in Egyptian Pounds (**EGP**) and retrieves the closest matching vehicles using multi-dimensional technical specifications.
 
 The repository implements an end-to-end MLOps lifecycle: data versioning via **DVC** backed by **AWS S3** (`eg-cars-1`), deterministic model training with **Scikit-Learn**, containerized inference via **Docker**, and cloud orchestration on **Amazon EKS**[cite: 2].
