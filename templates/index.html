@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Egypt Car Prediction & Finder (Hatla2ee & Dubizzle)</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 24px; }
+    .container { max-width: 1100px; margin: auto; }
+    h1 { color: #38bdf8; margin-bottom: 4px; }
+    p.sub { color: #94a3b8; margin-top: 0; margin-bottom: 24px; }
+    .card { background: #1e293b; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+    label { display: block; font-size: 0.85rem; color: #cbd5e1; margin-bottom: 6px; }
+    input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; box-sizing: border-box; }
+    button { margin-top: 16px; width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+    button:hover { background: #0369a1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 24px; background: #1e293b; border-radius: 12px; overflow: hidden; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #334155; font-size: 0.92rem; }
+    th { background: #0f172a; color: #38bdf8; }
+    .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; background: #334155; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Egypt Car Finder & Spec Predictor</h1>
+    <p class="sub">Search 5,000+ Hatla2ee & Dubizzle listings (50,000 EGP – 4,000,000 EGP)</p>
+
+    <div class="card">
+      <form id="predictForm">
+        <div class="grid">
+          <div>
+            <label>Budget / Price (EGP) *</label>
+            <input type="number" id="price_egp" min="50000" max="4000000" step="5000" value="850000" required />
+          </div>
+          <div>
+            <label>Transmission</label>
+            <select id="transmission">
+              <option value="Any">Any</option>
+              <option value="Automatic">Automatic</option>
+              <option value="Manual">Manual</option>
+            </select>
+          </div>
+          <div>
+            <label>Design Type</label>
+            <select id="design_type">
+              <option value="Any">Any</option>
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Hatchback">Hatchback</option>
+            </select>
+          </div>
+          <div>
+            <label>Engine CC (Optional)</label>
+            <input type="number" id="cc" placeholder="e.g. 1600" />
+          </div>
+          <div>
+            <label>Horsepower HP (Optional)</label>
+            <input type="number" id="hp" placeholder="e.g. 120" />
+          </div>
+          <div>
+            <label>Torque Nm (Optional)</label>
+            <input type="number" id="torque_nm" placeholder="e.g. 155" />
+          </div>
+        </div>
+        <button type="submit">Find Matching Cars</button>
+      </form>
+    </div>
+
+    <div id="status" style="margin-top:16px; color:#94a3b8;"></div>
+    <table id="resultsTable" style="display:none;">
+      <thead>
+        <tr>
+          <th>Car</th>
+          <th>Year</th>
+          <th>Design</th>
+          <th>Transmission</th>
+          <th>CC</th>
+          <th>HP</th>
+          <th>Torque (Nm)</th>
+          <th>Source</th>
+          <th>Price (EGP)</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    document.getElementById("predictForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const payload = {
+        price_egp: Number(document.getElementById("price_egp").value),
+        transmission: document.getElementById("transmission").value,
+        design_type: document.getElementById("design_type").value,
+        cc: document.getElementById("cc").value,
+        hp: document.getElementById("hp").value,
+        torque_nm: document.getElementById("torque_nm").value
+      };
+
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      document.getElementById("status").innerText = `Found ${data.total_matches} matching cars around ${Number(data.query_price_egp).toLocaleString()} EGP:`;
+      const tbody = document.getElementById("resultsBody");
+      tbody.innerHTML = "";
+      data.cars.forEach(car => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${car.brand} ${car.model}</strong></td>
+            <td>${car.year}</td>
+            <td>${car.design_type}</td>
+            <td>${car.transmission}</td>
+            <td>${car.cc} cc</td>
+            <td>${car.hp} hp</td>
+            <td>${car.torque_nm} Nm</td>
+            <td><span class="badge">${car.source}</span></td>
+            <td><strong>${Number(car.price_egp).toLocaleString()} EGP</strong></td>
+          </tr>`;
+      });
+      document.getElementById("resultsTable").style.display = "table";
+    });
+  </script>
+</body>
+</html>
